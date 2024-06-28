@@ -1,3 +1,2 @@
-import Registration from './components/Registration/Registration';
-
-export { Registration };
+import RegistrationPage from './components/RegistrationPage/RegistrationPage';
+export { RegistrationPage };

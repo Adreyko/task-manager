@@ -8,8 +8,9 @@ import { User } from './enteties/user.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private userRepository: Repository<User>
   ) {}
+
   async findOneBy(field: {
     username?: string;
     email?: string;
@@ -18,5 +19,13 @@ export class UsersService {
     const users = await this.userRepository.findOne({ where: field });
 
     return users;
+  }
+
+  async findUserById(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['email', 'firstName', 'lastName', 'username', 'id'],
+    });
+    return user;
   }
 }

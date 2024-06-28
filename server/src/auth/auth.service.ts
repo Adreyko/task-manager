@@ -34,7 +34,7 @@ export class AuthService {
     private tokenRepository: Repository<Token>,
     private userService: UsersService,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {}
 
   async create(data: RegisterDTO): Promise<User> {
@@ -98,7 +98,7 @@ export class AuthService {
       const token = await this.getTokens(user.id, user.username);
       const savedToken = await this.refreshTokenHandler(
         token.refreshToken,
-        user.id,
+        user.id
       );
       const userData = {
         email: user.firstName,
@@ -113,7 +113,7 @@ export class AuthService {
   }
   async validateUser(
     field: { username?: string; email?: string },
-    pass: string,
+    pass: string
   ): Promise<User> {
     const user = await this.userService.findOneBy(field);
     if (!user) {
@@ -137,7 +137,7 @@ export class AuthService {
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
           expiresIn: 10,
-        },
+        }
       ),
       this.jwtService.signAsync(
         {
@@ -147,7 +147,7 @@ export class AuthService {
         {
           secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
           expiresIn: '7d',
-        },
+        }
       ),
     ]);
 

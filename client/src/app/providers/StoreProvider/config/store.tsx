@@ -6,6 +6,8 @@ import {
 import { type StateSchema } from './StateSchema';
 import { useDispatch } from 'react-redux';
 import { createReducerManager } from './reducerManager';
+import { rtkApi } from '@/shared/api/rtkApi';
+import { userReducer } from '@/entities/User/slices/userSlice';
 
 declare const $CombinedState: unique symbol;
 interface EmptyObject {
@@ -17,11 +19,17 @@ export const createReduxStore = (
   initState?: StateSchema,
   asyncReducers?: ReducersMapObject<StateSchema>
 ) => {
-  const rootReducer: ReducersMapObject<StateSchema> = { ...asyncReducers };
+  const rootReducer: ReducersMapObject<StateSchema> = {
+    userState: userReducer,
+    ...asyncReducers,
+    [rtkApi.reducerPath]: rtkApi.reducer,
+  };
 
   const reducerManager = createReducerManager(rootReducer);
   const store = configureStore<StateSchema>({
     reducer: reducerManager.reduce as Reducer<CombinedState<StateSchema>>,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(rtkApi.middleware) as any,
     preloadedState: initState,
   });
 

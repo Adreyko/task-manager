@@ -5,8 +5,13 @@ import {
   type ReducersMapObject,
 } from '@reduxjs/toolkit';
 import { type CombinedState } from './store';
+import { rtkApi } from '@/shared/api/rtkApi';
+import { UserSchema } from '@/entities/User/slices/userSlice';
 
-export interface StateSchema {}
+export interface StateSchema {
+  userState: UserSchema;
+  [rtkApi.reducerPath]: ReturnType<typeof rtkApi.reducer>;
+}
 
 export type StateSchemaKey = keyof StateSchema;
 

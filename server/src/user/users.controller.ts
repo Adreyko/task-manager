@@ -1,25 +1,26 @@
 import {
-  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 
-import { User } from 'src/user/enteties/user.entity';
 import { UsersService } from './users.service';
+import { AccessTokenGuard } from 'src/guards/at.guard';
 // import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('api')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
-  // @UseGuards(AuthGuard)
-  @Get('users')
+  @UseGuards(AccessTokenGuard)
+  @Get('user')
   @HttpCode(HttpStatus.OK)
-  async getAuthUser(
-    @Body() field: { username?: string; email?: string },
-  ): Promise<User | undefined> {
-    return await this.userService.findOneBy(field);
+  async getAuthUser(@Req() req: Request) {
+    const userId = req.user['sub'];
+
+    return await this.userService.findUserById(userId);
   }
 }

@@ -3,9 +3,10 @@ import { Input } from '@/shared/components/Input';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 
 import { FormPanel } from '@/shared/components/FormPanel';
-import { Login } from '../types/login';
+
 import { useForm } from '@/shared/lib/hooks/useForm';
 import { useLoginUser } from '@/entities/User/api/userApi';
+import { Login } from '../types/login';
 const initRegisterForm = {
   username: '',
   password: '',
@@ -27,23 +28,17 @@ const LoginForm = () => {
     }
   }, [isError, error]);
 
-  const onSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      try {
-        loginUserMutation(loginForm);
-        if (!isError) {
-          resetForm();
-          setRequestError('');
-        }
-      } catch (error) {
-        console.log(error);
+  const onSubmit = useCallback(() => {
+    try {
+      loginUserMutation(loginForm);
+      if (!isError) {
+        resetForm();
+        setRequestError('');
       }
-    },
-
-    [isError, loginForm, loginUserMutation, resetForm]
-  );
+    } catch (error) {
+      console.log(error);
+    }
+  }, [isError, loginForm, loginUserMutation, resetForm]);
 
   return (
     <div className='flex items-center justify-center text-black py-20'>
@@ -62,7 +57,7 @@ const LoginForm = () => {
             placeholder='Username'
             name='username'
             label='Username'
-            classNames='w-full text-black'
+            className='w-full text-black'
             onChange={(value) => handleLoginForm(value, 'username')}
           />
 
@@ -74,7 +69,7 @@ const LoginForm = () => {
             isRequired
             placeholder='Password'
             label='Password'
-            classNames='w-full text-black'
+            className='w-full text-black'
           />
         </div>
       </FormPanel>

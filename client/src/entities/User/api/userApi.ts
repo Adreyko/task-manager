@@ -1,5 +1,5 @@
 import { rtkApi } from '@/shared/api/rtkApi';
-import { Login } from '@/pages/Login/Components/types/login';
+import { Login } from '@/pages/Login/components/types/login';
 
 import { User, accessToken, refreshToken } from '../types/user';
 export type UserData = Omit<User, 'password'>;

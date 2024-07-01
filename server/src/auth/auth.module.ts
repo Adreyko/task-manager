@@ -9,15 +9,24 @@ import { Token } from './enteties/refreshToken.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenStrategy } from 'src/strategies/at-strategy';
 import { RefreshTokenStrategy } from 'src/strategies/rt-strategy';
+import { SendMailsService } from 'src/sendMails/sendMails.service';
+import { SendMailsModule } from 'src/sendMails/sendMails.module';
+import { ResetToken } from './enteties/resetToken.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Token]), JwtModule.register({})],
+  imports: [
+    TypeOrmModule.forFeature([User, Token, ResetToken]),
+    JwtModule.register({}),
+    SendMailsModule,
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,
     UsersService,
+
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    SendMailsService,
   ],
   exports: [AuthService],
 })

@@ -24,8 +24,19 @@ export class UsersService {
   async findUserById(userId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['email', 'firstName', 'lastName', 'username', 'id'],
+      select: [
+        'email',
+        'firstName',
+        'lastName',
+        'username',
+        'id',
+        'isVerified',
+      ],
     });
     return user;
+  }
+
+  async updatedPassword(userId: number, newPassword: string) {
+    return await this.userRepository.update(userId, { password: newPassword });
   }
 }

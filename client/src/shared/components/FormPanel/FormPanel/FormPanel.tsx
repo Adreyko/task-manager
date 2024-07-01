@@ -3,15 +3,17 @@ import React, { ReactNode } from 'react';
 
 import { Form, Text } from 'react-aria-components';
 import { Button } from '../../Button';
+import { ButtonProps } from '../../Button/Button/Button';
 
 interface FormPanelProps {
   className?: string;
   title?: string;
   children: ReactNode;
-  onSubmit?: React.FormEventHandler<HTMLFormElement>;
+  onSubmit?: () => void;
   isLoading?: boolean;
   error?: string;
   buttonText?: string;
+  buttonProps?: ButtonProps;
 }
 
 const FormPanel = ({
@@ -22,14 +24,19 @@ const FormPanel = ({
   isLoading,
   error,
   buttonText,
+  buttonProps,
 }: FormPanelProps) => {
+  const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSubmit?.();
+  };
   return (
     <Form
       className={cn(
         'h-fit rounded-lg flex items-center py-10 gap-4 flex-col mx-auto border border-black bg-white',
         className
       )}
-      onSubmit={onSubmit}
+      onSubmit={onSubmitHandler}
     >
       {title && <Text className='text-2xl font-bold mb-5'>{title}</Text>}
       {children}
@@ -37,6 +44,7 @@ const FormPanel = ({
 
       {buttonText && (
         <Button
+          {...buttonProps}
           loading={isLoading}
           type='submit'
           size={'large'}

@@ -1,12 +1,16 @@
 import { Input } from '@/shared/components/Input';
 
-import { FormEvent, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { RegisterUser } from '../../types/register';
 import { ErrorMessage, useRegisterUser } from '../../api/register';
-import { useNavigate } from 'react-router-dom';
-import { getLogin } from '@/app/providers/Router/conts/routers';
+import { Link } from 'react-router-dom';
+
 import { FormPanel } from '@/shared/components/FormPanel';
 import { useForm } from '@/shared/lib/hooks/useForm';
+import { Button } from '@/shared/components/Button';
+import { cn } from '@/shared/lib/utils';
+import { Card } from '@/shared/components/Card';
+import { getRouteLogin } from '@/app/providers/Router/conts/routers';
 
 const initRegisterForm = {
   firstName: '',
@@ -21,133 +25,159 @@ const Registration = () => {
     useForm<RegisterUser>(initRegisterForm);
 
   const [registerMutation, { isLoading }] = useRegisterUser();
+  const [isEmailActivation, setIsEmailActivation] = useState(false);
 
   const [requestError, setRequestError] = useState<ErrorMessage>('');
-  const navigate = useNavigate();
 
-  const onSubmit = useCallback(
-    async (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const onSubmit = useCallback(async () => {
+    const dataToSend: Omit<RegisterUser, 'confirmPassword'> = {
+      username: registerForm.username,
+      email: registerForm.email,
+      password: registerForm.password,
+      firstName: registerForm.firstName,
+      lastName: registerForm.lastName,
+    };
+    setIsEmailActivation(true);
 
-      const dataToSend: Omit<RegisterUser, 'confirmPassword'> = {
-        username: registerForm.username,
-        email: registerForm.email,
-        password: registerForm.password,
-        firstName: registerForm.firstName,
-        lastName: registerForm.lastName,
-      };
-
-      try {
-        const res = await registerMutation(dataToSend).unwrap();
+    try {
+      const res = await registerMutation(dataToSend).unwrap();
+      //@ts-ignore
+      if (res?.message) {
         //@ts-ignore
-        if (res?.message) {
-          //@ts-ignore
-          setRequestError(res?.message);
-        } else {
-          setRequestError('');
-          resetForm();
-          navigate(getLogin());
-        }
-      } catch (error) {
-        console.log(error);
+        setRequestError(res?.message);
+      } else {
+        setRequestError('');
+        resetForm();
+        setIsEmailActivation(true);
       }
-    },
-
-    [
-      navigate,
-      registerForm.email,
-      registerForm.firstName,
-      registerForm.lastName,
-      registerForm.password,
-      registerForm.username,
-      registerMutation,
-      resetForm,
-    ]
-  );
+    } catch (error) {
+      console.log(error);
+    }
+  }, [
+    registerForm.email,
+    registerForm.firstName,
+    registerForm.lastName,
+    registerForm.password,
+    registerForm.username,
+    registerMutation,
+    resetForm,
+  ]);
 
   return (
     <div className='flex items-center justify-center text-black py-20'>
-      <FormPanel
-        isLoading={isLoading}
-        buttonText='Register'
-        error={requestError}
-        title='Register an account'
-        onSubmit={onSubmit}
-        className='w-1/2'
-      >
-        <div className='flex flex-col w-2/3 text-black gap-4'>
-          <div className='flex gap-10'>
-            <Input
-              value={registerForm.firstName}
-              isRequired
-              onChange={(value) => handleValueChange(value, 'firstName')}
-              type='text'
-              placeholder='First name'
-              label='First name'
-              name='firstName'
-              classNames='w-full text-black'
-            />
-            <Input
-              value={registerForm.lastName}
-              onChange={(value) => handleValueChange(value, 'lastName')}
-              isRequired
-              placeholder='Last name'
-              label='Last name'
-              name='lastName'
-              classNames='w-full text-black'
-            />
+      <div className='relative overflow-hidden h-full w-1/2'>
+        <Card
+          className={cn(
+            ' absolute -right-[1000%] transition-all duration-300 w-full',
+            {
+              'right-0 relative': isEmailActivation,
+            }
+          )}
+        >
+          <h1 className='text-2xl'>Thanks for registration in our App!</h1>
+          <div className='p-20 flex flex-col'>
+            <p className='text-xl'>
+              We have sent you an email with a link to activate your account.
+              Please check your email and click on the link to activate your
+              account. You can active your account in any time.
+            </p>
+            <Link to={getRouteLogin()} className='self-center'>
+              <Button
+                variant={'primary'}
+                size={'large'}
+                className={'mt-10 w-fit self-center'}
+              >
+                Do it letter
+              </Button>
+            </Link>
           </div>
+        </Card>
 
-          <Input
-            value={registerForm.username}
-            onChange={(value) => handleValueChange(value, 'username')}
-            isRequired
-            placeholder='Username'
-            name='username'
-            label='Username'
-            classNames='w-full text-black'
-          />
-          <Input
-            value={registerForm.email}
-            onChange={(value) => handleValueChange(value, 'email')}
-            isRequired
-            type='email'
-            name='email'
-            placeholder='Email'
-            label='Email'
-            classNames='w-full text-black'
-          />
-          <div className='flex gap-10'>
-            <Input
-              onChange={(value) => handleValueChange(value, 'password')}
-              value={registerForm.password}
-              name='password'
-              type='password'
-              isRequired
-              placeholder='Password'
-              label='Password'
-              classNames='w-full text-black'
-            />
-            <Input
-              validate={(value) =>
-                value
-                  ? value !== registerForm.password
-                    ? 'please add the same password'
-                    : ''
-                  : ''
-              }
-              onChange={(value) => handleValueChange(value, 'confirmPassword')}
-              value={registerForm.confirmPassword}
-              name='confirmPassword'
-              type='password'
-              isRequired
-              placeholder='Confirm password'
-              label='Confirm password'
-              classNames='w-full text-black'
-            />
-          </div>
-        </div>
-      </FormPanel>
+        {!isEmailActivation && (
+          <FormPanel
+            isLoading={isLoading}
+            buttonText='Register'
+            error={requestError}
+            title='Register an account'
+            onSubmit={onSubmit}
+          >
+            <div className='flex flex-col w-2/3 text-black gap-4  '>
+              <div className='flex gap-10'>
+                <Input
+                  value={registerForm.firstName}
+                  isRequired
+                  onChange={(value) => handleValueChange(value, 'firstName')}
+                  type='text'
+                  placeholder='First name'
+                  label='First name'
+                  name='firstName'
+                  className='w-full text-black'
+                />
+                <Input
+                  value={registerForm.lastName}
+                  onChange={(value) => handleValueChange(value, 'lastName')}
+                  isRequired
+                  placeholder='Last name'
+                  label='Last name'
+                  name='lastName'
+                  className='w-full text-black'
+                />
+              </div>
+
+              <Input
+                value={registerForm.username}
+                onChange={(value) => handleValueChange(value, 'username')}
+                isRequired
+                placeholder='Username'
+                name='username'
+                label='Username'
+                className='w-full text-black'
+              />
+              <Input
+                value={registerForm.email}
+                onChange={(value) => handleValueChange(value, 'email')}
+                isRequired
+                type='email'
+                name='email'
+                placeholder='Email'
+                label='Email'
+                className='w-full text-black'
+              />
+              <div className='flex gap-10'>
+                <Input
+                  onChange={(value) => handleValueChange(value, 'password')}
+                  value={registerForm.password}
+                  name='password'
+                  type='password'
+                  isRequired
+                  placeholder='Password'
+                  label='Password'
+                  className='w-full text-black'
+                />
+                <Input
+                  validate={(value) =>
+                    value
+                      ? value !== registerForm.password
+                        ? 'please add the same password'
+                        : ''
+                      : ''
+                  }
+                  onChange={(value) =>
+                    handleValueChange(value, 'confirmPassword')
+                  }
+                  value={registerForm.confirmPassword}
+                  name='confirmPassword'
+                  type='password'
+                  isRequired
+                  placeholder='Confirm password'
+                  label='Confirm password'
+                  className='w-full text-black'
+                />
+              </div>
+            </div>
+          </FormPanel>
+        )}
+      </div>
     </div>
   );
 };

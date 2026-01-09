@@ -6,6 +6,7 @@ import { RegistrationPage } from '@/pages/Registration';
 import { LoginPage } from '@/pages/Login';
 import { ForgotPassword } from '@/pages/ForgotPassword';
 import { ChangePasswordPage } from '@/pages/ChangePassword';
+import { ProfilePage } from '@/pages/ProfilePage';
 
 export const routeConfig: Record<AppRoutes, RouteProps> = {
   [AppRoutes.MAIN]: {
@@ -27,5 +28,9 @@ export const routeConfig: Record<AppRoutes, RouteProps> = {
   [AppRoutes.ChangePass]: {
     path: RouterPath['change-password'],
     element: <ChangePasswordPage />,
+  },
+  [AppRoutes.Profile]: {
+    path: RouterPath.profile,
+    element: <ProfilePage />,
   },
 };

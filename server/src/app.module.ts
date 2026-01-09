@@ -16,16 +16,16 @@ import { Token } from './auth/enteties/refreshToken.entity';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    // JwtModule.registerAsync({
-    //   inject: [ConfigService],
-    //   global: true,
-    //   useFactory: (configService: ConfigService) => ({
-    //     secret: configService.get<string>('JWT_SECRET'),
-    //     signOptions: {
-    //       expiresIn: '1h',
-    //     },
-    //   }),
-    // }),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      global: true,
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: '1h',
+        },
+      }),
+    }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({

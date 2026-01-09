@@ -26,7 +26,6 @@ import { ResetToken } from './enteties/resetToken.entity';
 
     AccessTokenStrategy,
     RefreshTokenStrategy,
-    SendMailsService,
   ],
   exports: [AuthService],
 })
